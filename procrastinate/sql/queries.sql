@@ -70,7 +70,7 @@ WHERE id IN (
 
 -- finish_job --
 -- Finish a job, changing it from "doing" to "succeeded" or "failed"
-SELECT procrastinate_finish_job_v1(%(job_id)s, %(status)s, %(delete_job)s);
+SELECT procrastinate_finish_job_v1(%(job_id)s, %(status)s, %(delete_job)s, %(result)s);
 
 -- cancel_job --
 -- Cancel a job, changing it from "todo" to "cancelled" or mark for abortion
