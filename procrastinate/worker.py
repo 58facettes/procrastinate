@@ -209,7 +209,7 @@ class Worker:
             if status == jobs.Status.FAILED and not job_retry
             else logging.INFO
         )
-        logger.log(log_level, text, extra=extra, exc_info=exc_info)
+        logger.log(log_level, text, extra=extra, exc_info=str(exc_info)[:128])
 
     async def _process_job(self, context: job_context.JobContext):
         """
