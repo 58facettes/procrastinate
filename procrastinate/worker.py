@@ -57,10 +57,10 @@ class Worker:
         self.abort_job_polling_interval = abort_job_polling_interval
         self.listen_notify = listen_notify
         self.delete_jobs = (
-            jobs.DeleteJobCondition(delete_jobs)
-            if isinstance(delete_jobs, str)
-            else delete_jobs
-        ) or jobs.DeleteJobCondition.NEVER
+                               jobs.DeleteJobCondition(delete_jobs)
+                               if isinstance(delete_jobs, str)
+                               else delete_jobs
+                           ) or jobs.DeleteJobCondition.NEVER
         self.additional_context = additional_context
         self.install_signal_handlers = install_signal_handlers
         self.update_heartbeat_interval = update_heartbeat_interval
@@ -209,7 +209,8 @@ class Worker:
             if status == jobs.Status.FAILED and not job_retry
             else logging.INFO
         )
-        logger.log(log_level, text, extra=extra, exc_info=str(exc_info)[:128])
+        logger.log(log_level, text, extra=extra,
+                   exc_info=str(exc_info)[:128].replace("\n", ""))
 
     async def _process_job(self, context: job_context.JobContext):
         """
