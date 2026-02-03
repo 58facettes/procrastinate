@@ -295,7 +295,7 @@ class InMemoryConnector(connector.BaseAsyncConnector):
         job_id: int,
         status: str,
         delete_job: bool,
-        exc_info: bool | BaseException = False,
+        result: str|None=None,
     ) -> None:
         if delete_job:
             self.jobs.pop(job_id)
@@ -303,6 +303,7 @@ class InMemoryConnector(connector.BaseAsyncConnector):
 
         job_row = self.jobs[job_id]
         job_row["status"] = status
+        job_row["result"] = result
         job_row["attempts"] += 1
         job_row["abort_requested"] = False
         self.events[job_id].append({"type": status, "at": utils.utcnow()})

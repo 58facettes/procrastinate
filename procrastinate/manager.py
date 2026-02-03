@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import traceback
 import warnings
 from collections.abc import Awaitable, Iterable
 from typing import Any, NoReturn, Protocol
@@ -314,12 +315,17 @@ class JobManager:
         delete_job: bool,
         exc_info: bool | BaseException = False,
     ) -> None:
+        stacktrace = "".join(traceback.format_exception(
+            type(exc_info),
+            exc_info,
+            exc_info.__traceback__
+        )) if isinstance(exc_info, BaseException) else None
         await self.connector.execute_query_async(
             query=sql.queries["finish_job"],
             job_id=job_id,
             status=status.value,
             delete_job=delete_job,
-            result=str(exc_info) if exc_info else None,
+            result=stacktrace,
         )
 
     def cancel_job_by_id(
