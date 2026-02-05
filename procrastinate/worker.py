@@ -200,17 +200,20 @@ class Worker:
             text += f"lasted {duration:.3f} s"
         if job_result and job_result.result:
             text += f" - Result: {job_result.result}"[:250]
+        if isinstance(exc_info, BaseException):
+            text += f" - {str(exc_info)[:128].replace("\n", " ")}"
 
         extra = self._log_extra(
             context=context, action=log_action, job_result=job_result
         )
+        if isinstance(exc_info, BaseException):
+            extra["exception"] = str(exc_info)[:128].replace("\n", " ")
         log_level = (
             logging.ERROR
             if status == jobs.Status.FAILED and not job_retry
             else logging.INFO
         )
-        logger.log(log_level, text, extra=extra,
-                   exc_info=str(exc_info)[:128].replace("\n", ""))
+        logger.log(log_level, text, extra=extra)
 
     async def _process_job(self, context: job_context.JobContext):
         """
