@@ -24,6 +24,22 @@ from procrastinate import (
 
 logger = logging.getLogger(__name__)
 
+
+def _format_exception_message(exc: BaseException, max_len: int = 128) -> str:
+    """Try str, repr, args, type name; return truncated single line or '<empty>'."""
+    msg = str(exc).strip()
+    if not msg:
+        msg = repr(exc).strip()
+    if not msg and getattr(exc, "args", None) and exc.args:
+        msg = " ".join(str(a) for a in exc.args).strip()
+    if not msg:
+        msg = type(exc).__name__
+    if not msg:
+        msg = "<empty>"
+    msg = msg.replace("\n", " ")[:max_len]
+    return msg or "<empty>"
+
+
 WORKER_NAME = "worker"
 WORKER_CONCURRENCY = 1  # maximum number of parallel jobs
 FETCH_JOB_POLLING_INTERVAL = 5.0  # seconds
@@ -201,13 +217,13 @@ class Worker:
         if job_result and job_result.result:
             text += f" - Result: {job_result.result}"[:250]
         if isinstance(exc_info, BaseException):
-            text += f" - {str(exc_info)[:128].replace("\n", " ")}"
+            text += f" - {_format_exception_message(exc_info)}"
 
         extra = self._log_extra(
             context=context, action=log_action, job_result=job_result
         )
         if isinstance(exc_info, BaseException):
-            extra["exception"] = str(exc_info)[:128].replace("\n", " ")
+            extra["exception"] = _format_exception_message(exc_info)
         log_level = (
             logging.ERROR
             if status == jobs.Status.FAILED and not job_retry
