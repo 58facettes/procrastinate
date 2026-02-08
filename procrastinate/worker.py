@@ -216,12 +216,8 @@ class Worker:
             text += f"lasted {duration:.3f} s"
         if job_result and job_result.result:
             text += f" - Result: {job_result.result}"[:250]
-        if isinstance(exc_info, BaseException):
-            text += f" - {_format_exception_message(exc_info)}"
 
-        extra = self._log_extra(
-            context=context, action=log_action, job_result=job_result
-        )
+        extra = {}
         if isinstance(exc_info, BaseException):
             extra["exception"] = _format_exception_message(exc_info)
         log_level = (
